@@ -15,3 +15,7 @@ Route::get('/', 'WebchatController@index');
 Route::get('/webchat/create', 'WebchatController@create');
 
 
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index');
