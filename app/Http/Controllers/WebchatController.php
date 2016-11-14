@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\Validator;
 
 class WebchatController extends Controller
 {
-    //
+    // ---------------------------------------------------------------------------------------------------
     public function index()
     {
         return view('webchat.index');
     }
 
+    // ---------------------------------------------------------------------------------------------------
     public function create()
     {
         if (!session()->has('errors')) {
@@ -29,6 +30,7 @@ class WebchatController extends Controller
         }
     }
 
+    // ---------------------------------------------------------------------------------------------------
     public function store(Request $request)
     {
         // validations rules --------------------------------------
@@ -48,7 +50,9 @@ class WebchatController extends Controller
         $room->title = ucfirst($request->title);
         $room->user_id = Auth::id();
         $room->status = $request->status;
-        $room->image = $request->file('pic')->getClientOriginalName();
+
+        $image = ( Auth::id() . time() . $request->file('pic')->getClientOriginalName() );
+        $room->image = $image;
 
         if ($request->status = 'special_private_room') {
             // generate reference pecial_private_room
@@ -56,12 +60,32 @@ class WebchatController extends Controller
             $room->reference = $random;
         }
 
+        /*$request->file('pic')->storeAs(
+            'public/cv_dir',
+            $request->file('pic')->getClientOriginalName()
+        );*/
+
+        $request->file('pic')->move( public_path('images'), $image );
         $room->save();
+
         return redirect('/');
     }
 
-    public function show($id)
+    // ---------------------------------------------------------------------------------------------------
+    public function showAll()
     {
-        dd('Chat room id: ' . $id);
+        if (Auth::guest()) {
+
+            $rooms = Room::where('status', 'guests')
+                ->orderBy('title', 'asc')
+                ->get();
+
+        } else {
+            $rooms = Room::all();
+        }
+
+        // dd( $rooms );
+
+        return view('webchat.show_all', ['rooms' => $rooms]);
     }
 }
