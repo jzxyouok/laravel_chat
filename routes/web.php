@@ -13,6 +13,7 @@
 
 Route::get('/', 'WebchatController@index');
 Route::get('/webchat/create', 'WebchatController@create');
+Route::post('/webchat/store', 'WebchatController@store');
 
 
 
