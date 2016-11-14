@@ -4,7 +4,7 @@
 
     <div class="container">
         <h2>Create web chat room</h2>
-        <form class="form-horizontal" action="/webchat/store" method="post">
+        <form class="form-horizontal" action="/webchat/store" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="form-group">
                 <label class="control-label col-sm-2" for="title">Title:</label>
@@ -22,10 +22,10 @@
             <div class="form-group">
                 <label class="control-label col-sm-2" for="sel1">Users that can see:</label>
                 <div class="col-sm-10">
-                    <select class="form-control" id="sel1">
-                        <option>Guests</option>
-                        <option>Authorized users</option>
-                        <option>Special Private Room</option>
+                    <select name="status" class="form-control" id="sel1">
+                        <option value="guests">Guests</option>
+                        <option value="authorized_users">Authorized users</option>
+                        <option value="special_private_room">Special Private Room</option>
                     </select>
                 </div>
             </div>

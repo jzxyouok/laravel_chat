@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Room;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class WebchatController extends Controller
@@ -20,25 +22,42 @@ class WebchatController extends Controller
             session( ['success', 'Good, your room created !!!'] );
         }
 
-        return view('webchat.create');
+        if (!Auth::guest()) {
+            return view('webchat.create');
+        } else {
+            return redirect('/register');
+        }
     }
 
     public function store(Request $request)
     {
-        // validation
+        // validations rules --------------------------------------
         $validator = Validator::make($request->all(), [
             'title' => 'required|unique:rooms|max:255',
-            'pic'   => 'required'
+            'pic'   => 'required|mimes:jpeg,jpg,png,gif|max:2000'
         ]);
 
         if ($validator->fails()) {
             return redirect('webchat/create')
                 ->withErrors($validator)
                 ->withInput();
-        } else {
-            // insert
-
         }
+
+        // Model (insert) ------------------------------------------
+        $room = new Room();
+        $room->title = ucfirst($request->title);
+        $room->user_id = Auth::id();
+        $room->status = $request->status;
+        $room->image = $request->file('pic')->getClientOriginalName();
+
+        if ($request->status = 'special_private_room') {
+            // generate reference pecial_private_room
+            $random = ( Auth::id() . time() . uniqid() );
+            $room->reference = $random;
+        }
+
+        $room->save();
+        return redirect('/');
     }
 
     public function show($id)
